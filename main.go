@@ -27,9 +27,10 @@ func main() {
 
 	// registers the route
 	mux.Handle("/app/", apiCfg.MiddlewareMetricsInc(strippedHandler))
-	mux.HandleFunc("GET /healthz", functions.HandlerReadiness)
-	mux.HandleFunc("GET /metrics", apiCfg.HandlerMetrics)
-	mux.HandleFunc("POST /reset", apiCfg.HandlerReset)
+
+	mux.HandleFunc("GET /api/healthz", functions.HandlerReadiness)
+	mux.HandleFunc("GET /admin/metrics", apiCfg.HandlerMetrics)
+	mux.HandleFunc("POST /admin/reset", apiCfg.HandlerReset)
 
 	// starts listening
 	server.ListenAndServe()
