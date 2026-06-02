@@ -28,6 +28,7 @@ func main() {
 	// registers the route
 	mux.Handle("/app/", apiCfg.MiddlewareMetricsInc(strippedHandler))
 
+	mux.HandleFunc("POST /api/validate_chirp", apiCfg.HandlerChirp)
 	mux.HandleFunc("GET /api/healthz", functions.HandlerReadiness)
 	mux.HandleFunc("GET /admin/metrics", apiCfg.HandlerMetrics)
 	mux.HandleFunc("POST /admin/reset", apiCfg.HandlerReset)
