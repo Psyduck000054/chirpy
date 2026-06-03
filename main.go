@@ -16,6 +16,8 @@ import (
 func main() {
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
+	platform := os.Getenv("PLATFORM")
+
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		fmt.Printf("Can't open database")
@@ -26,6 +28,7 @@ func main() {
 	apiCfg := functions.ApiConfig{
 		FileServerHits: atomic.Int32{},
 		Queries:        dbQueries,
+		Platform:       platform,
 	}
 
 	// create a multiplexer
@@ -45,7 +48,9 @@ func main() {
 	mux.Handle("/app/", apiCfg.MiddlewareMetricsInc(strippedHandler))
 
 	mux.HandleFunc("POST /api/validate_chirp", apiCfg.HandlerChirp)
+	mux.HandleFunc("POST /api/users", apiCfg.HandlerCreateUser)
 	mux.HandleFunc("GET /api/healthz", functions.HandlerReadiness)
+
 	mux.HandleFunc("GET /admin/metrics", apiCfg.HandlerMetrics)
 	mux.HandleFunc("POST /admin/reset", apiCfg.HandlerReset)
 
