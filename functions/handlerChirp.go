@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
+	"strings"
 )
 
 func (cfg *ApiConfig) HandlerChirp(w http.ResponseWriter, r *http.Request) {
@@ -11,11 +13,17 @@ func (cfg *ApiConfig) HandlerChirp(w http.ResponseWriter, r *http.Request) {
 		Chirp string `json:"body"`
 	}
 
-	type ReturnChirpValid struct {
-		Check bool `json:"valid"`
+	type ReturnCensoredChirp struct {
+		CensoredChirp string `json:"cleaned_body"`
 	}
 
-	validResp := new(ReturnChirpValid)
+	bannedWords := []string{
+		"kerfuffle",
+		"sharbert",
+		"fornax",
+	}
+
+	censoredResp := new(ReturnCensoredChirp)
 
 	decoder := json.NewDecoder(r.Body)
 	Chirps := ChirpStruct{}
@@ -30,7 +38,16 @@ func (cfg *ApiConfig) HandlerChirp(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, 400, "Chirp is too long")
 		return
 	} else {
-		validResp.Check = true
-		RespondWithJSON(w, 200, validResp)
+		wordList := strings.Split(Chirps.Chirp, " ")
+		for index, word := range wordList {
+			if slices.Contains(bannedWords, strings.ToLower(word)) {
+				wordList[index] = "****"
+			}
+		}
+
+		censoredString := strings.Join(wordList, " ")
+		censoredResp.CensoredChirp = censoredString
+
+		RespondWithJSON(w, 200, censoredResp)
 	}
 }
