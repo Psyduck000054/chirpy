@@ -47,7 +47,7 @@ func main() {
 	// registers the route
 	mux.Handle("/app/", apiCfg.MiddlewareMetricsInc(strippedHandler))
 
-	mux.HandleFunc("POST /api/validate_chirp", apiCfg.HandlerChirp)
+	mux.HandleFunc("POST /api/chirps", apiCfg.HandlerCreateChirp)
 	mux.HandleFunc("POST /api/users", apiCfg.HandlerCreateUser)
 	mux.HandleFunc("GET /api/healthz", functions.HandlerReadiness)
 
