@@ -9,7 +9,6 @@ import (
 )
 
 func (cfg *ApiConfig) HandlerRetrieveChirps(w http.ResponseWriter, r *http.Request) {
-
 	type ChirpStruct struct {
 		Id        uuid.UUID `json:"id"`
 		CreatedAt time.Time `json:"created_at"`
