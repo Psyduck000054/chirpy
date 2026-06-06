@@ -6,44 +6,62 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Psyduck000054/chirpy/internal/auth"
 	"github.com/Psyduck000054/chirpy/internal/database"
 	"github.com/google/uuid"
 )
 
+type User struct {
+	Id        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Email     string    `json:"email"`
+	Password  string    `json:"-"`
+}
+
 func (cfg *ApiConfig) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
-	type emailInput struct {
-		Email string `json:"email"`
+	type Input0 struct {
+		Password string `json:"password"`
+		Email    string `json:"email"`
 	}
 
-	type userOutput struct {
-		Id        uuid.UUID `json:"id"`
-		CreatedAt time.Time `json:"created_at"`
-		UpdatedAt time.Time `json:"updated_at"`
-		Email     string    `json:"email"`
+	type Output0 struct {
+		User
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	emailStruct0 := emailInput{}
-	user0 := userOutput{}
+	params := Input0{}
 
-	err := decoder.Decode(&emailStruct0)
+	err := decoder.Decode(&params)
 	if err != nil {
-		RespondWithError(w, 400, fmt.Sprintf("something went wrong: %s", err))
+		RespondWithError(w, 400, fmt.Sprintln("Couldn't decode parameters", err))
+		return
+	}
+
+	hashedPassword, err := auth.HashPassword(params.Password)
+	if err != nil {
+		RespondWithError(w, 400, fmt.Sprintln("Couldn't hash password", err))
 		return
 	}
 
 	var usr database.User
 
-	usr, err = cfg.Queries.CreateUser(r.Context(), emailStruct0.Email)
+	usr, err = cfg.Queries.CreateUser(r.Context(), database.CreateUserParams{
+		Email:          params.Email,
+		HashedPassword: hashedPassword,
+	})
+
 	if err != nil {
-		RespondWithError(w, 400, fmt.Sprintf("something went wrong: %s", err))
+		RespondWithError(w, 400, fmt.Sprintln("Couldn't create user", err))
 		return
 	}
 
-	user0.Id = usr.ID
-	user0.CreatedAt = usr.CreatedAt
-	user0.UpdatedAt = usr.UpdatedAt
-	user0.Email = usr.Email
-
-	RespondWithJSON(w, 201, user0)
+	RespondWithJSON(w, 201, Output0{
+		User: User{
+			Id:        usr.ID,
+			CreatedAt: usr.CreatedAt,
+			UpdatedAt: usr.UpdatedAt,
+			Email:     usr.Email,
+		},
+	})
 }
