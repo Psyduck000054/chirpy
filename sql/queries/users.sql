@@ -19,3 +19,11 @@ WHERE email = $1;
 -- name: GetUserByID :one
 select * from users
 where id = $1;
+
+-- name: EditUserInfo :one
+update users set
+hashed_password = $2,
+email = $3,
+updated_at = now()
+where id = $1
+returning *;

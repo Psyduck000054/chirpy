@@ -12,7 +12,7 @@ import (
 )
 
 type User struct {
-	Id           uuid.UUID `json:"id"`
+	ID           uuid.UUID `json:"id"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 	Email        string    `json:"email"`
@@ -60,7 +60,7 @@ func (cfg *ApiConfig) HandlerCreateUser(w http.ResponseWriter, r *http.Request) 
 
 	RespondWithJSON(w, 201, Output0{
 		User: User{
-			Id:        usr.ID,
+			ID:        usr.ID,
 			CreatedAt: usr.CreatedAt,
 			UpdatedAt: usr.UpdatedAt,
 			Email:     usr.Email,

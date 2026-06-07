@@ -67,7 +67,7 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 
 	RespondWithJSON(w, http.StatusOK, response{
 		User: User{
-			Id:           user.ID,
+			ID:           user.ID,
 			Email:        user.Email,
 			CreatedAt:    user.CreatedAt,
 			UpdatedAt:    user.UpdatedAt,
