@@ -17,6 +17,7 @@ func main() {
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
 	platform := os.Getenv("PLATFORM")
+	secret := os.Getenv("SECRET")
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
@@ -29,6 +30,7 @@ func main() {
 		FileServerHits: atomic.Int32{},
 		Queries:        dbQueries,
 		Platform:       platform,
+		SecretJWT:      secret,
 	}
 
 	// create a multiplexer
@@ -50,6 +52,8 @@ func main() {
 	mux.HandleFunc("POST /api/chirps", apiCfg.HandlerCreateChirp)
 	mux.HandleFunc("POST /api/users", apiCfg.HandlerCreateUser)
 	mux.HandleFunc("POST /api/login", apiCfg.HandlerLogin)
+	mux.HandleFunc("POST /api/refresh", apiCfg.HandlerRefresh)
+	mux.HandleFunc("POST /api/revoke", apiCfg.HandlerRevoke)
 
 	mux.HandleFunc("GET /api/healthz", functions.HandlerReadiness)
 	mux.HandleFunc("GET /api/chirps", apiCfg.HandlerRetrieveChirps)

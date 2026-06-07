@@ -8,7 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Psyduck000054/chirpy/internal/auth"
 	"github.com/Psyduck000054/chirpy/internal/database"
+
 	"github.com/google/uuid"
 )
 
@@ -54,10 +56,24 @@ func (cfg *ApiConfig) HandlerCreateChirp(w http.ResponseWriter, r *http.Request)
 
 		censoredString := strings.Join(wordList, " ")
 
+		// jwt check
+		token, err := auth.GetBearerToken(r.Header)
+		if err != nil {
+			RespondWithError(w, 401, "Couldn't get Bearer token")
+			return
+		}
+
+		validatedID, err := auth.ValidateJWT(token, cfg.SecretJWT)
+		if err != nil {
+			RespondWithError(w, 401, "Couldn't validate JWT token")
+			return
+		}
+
 		params := database.SaveChirpParams{
 			Body:   censoredString,
-			UserID: Chirps.UserID,
+			UserID: validatedID,
 		}
+
 		chirp, err := cfg.Queries.SaveChirp(r.Context(), params)
 		if err != nil {
 			RespondWithError(w, 400, fmt.Sprintf("something went wrong: %s", err))
