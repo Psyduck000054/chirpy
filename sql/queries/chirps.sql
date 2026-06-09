@@ -9,11 +9,16 @@ VALUES (
 )
 RETURNING *;
 
--- name: RetrieveAllChirps :many
+-- name: RetrieveAllChirps_Asc :many
 select * from chirps order by created_at asc;
+-- name: RetrieveAllChirps_Desc :many
+select * from chirps order by created_at desc;
 
--- name: RetrieveChirpsByAuthorID :many
+
+-- name: RetrieveChirpsByAuthorID_Asc :many
 select * from chirps where user_id = $1 order by created_at asc;
+-- name: RetrieveChirpsByAuthorID_Desc :many
+select * from chirps where user_id = $1 order by created_at desc;
 
 -- name: GetChirp :one
 select * from chirps where id = $1;

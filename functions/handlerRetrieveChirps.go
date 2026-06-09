@@ -22,6 +22,12 @@ func (cfg *ApiConfig) HandlerRetrieveChirps(w http.ResponseWriter, r *http.Reque
 		userID = uuid.Nil
 	}
 
+	var order string
+	order = r.URL.Query().Get("sort")
+	if (order != "asc" && order != "desc") && order != "" {
+		order = "asc"
+	}
+
 	type ChirpStruct struct {
 		Id        uuid.UUID `json:"id"`
 		CreatedAt time.Time `json:"created_at"`
@@ -36,9 +42,17 @@ func (cfg *ApiConfig) HandlerRetrieveChirps(w http.ResponseWriter, r *http.Reque
 
 	var chirpList []database.Chirp
 	if userID == uuid.Nil {
-		chirpList, err = cfg.Queries.RetrieveAllChirps(r.Context())
+		if order == "asc" {
+			chirpList, err = cfg.Queries.RetrieveAllChirps_Asc(r.Context())
+		} else {
+			chirpList, err = cfg.Queries.RetrieveAllChirps_Desc(r.Context())
+		}
 	} else {
-		chirpList, err = cfg.Queries.RetrieveChirpsByAuthorID(r.Context(), userID)
+		if order == "asc" {
+			chirpList, err = cfg.Queries.RetrieveChirpsByAuthorID_Asc(r.Context(), userID)
+		} else {
+			chirpList, err = cfg.Queries.RetrieveChirpsByAuthorID_Desc(r.Context(), userID)
+		}
 	}
 	chirpStruct0 := ChirpStruct{}
 	output0 := Output{}
