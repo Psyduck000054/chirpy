@@ -19,6 +19,7 @@ type User struct {
 	Password     string    `json:"-"`
 	AccessToken  string    `json:"token"`
 	RefreshToken string    `json:"refresh_token"`
+	IsChirpyRed  bool      `json:"is_chirpy_red"`
 }
 
 func (cfg *ApiConfig) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -60,10 +61,11 @@ func (cfg *ApiConfig) HandlerCreateUser(w http.ResponseWriter, r *http.Request) 
 
 	RespondWithJSON(w, 201, Output0{
 		User: User{
-			ID:        usr.ID,
-			CreatedAt: usr.CreatedAt,
-			UpdatedAt: usr.UpdatedAt,
-			Email:     usr.Email,
+			ID:          usr.ID,
+			CreatedAt:   usr.CreatedAt,
+			UpdatedAt:   usr.UpdatedAt,
+			Email:       usr.Email,
+			IsChirpyRed: usr.IsChirpyRed,
 		},
 	})
 }
