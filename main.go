@@ -18,6 +18,7 @@ func main() {
 	dbURL := os.Getenv("DB_URL")
 	platform := os.Getenv("PLATFORM")
 	secret := os.Getenv("SECRET")
+	polkaAPIKey := os.Getenv("POLKA_KEY")
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
@@ -31,6 +32,7 @@ func main() {
 		Queries:        dbQueries,
 		Platform:       platform,
 		SecretJWT:      secret,
+		PolkaAPIKey:    polkaAPIKey,
 	}
 
 	// create a multiplexer

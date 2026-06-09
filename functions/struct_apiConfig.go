@@ -11,4 +11,5 @@ type ApiConfig struct {
 	Queries        *database.Queries
 	Platform       string
 	SecretJWT      string
+	PolkaAPIKey    string
 }

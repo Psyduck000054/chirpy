@@ -57,7 +57,7 @@ func (cfg *ApiConfig) HandlerCreateChirp(w http.ResponseWriter, r *http.Request)
 		censoredString := strings.Join(wordList, " ")
 
 		// jwt check
-		token, err := auth.GetBearerToken(r.Header)
+		token, err := auth.GetToken(r.Header, "Bearer ")
 		if err != nil {
 			RespondWithError(w, 401, "Couldn't get Bearer token")
 			return
