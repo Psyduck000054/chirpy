@@ -70,6 +70,39 @@ func (q *Queries) RetrieveAllChirps(ctx context.Context) ([]Chirp, error) {
 	return items, nil
 }
 
+const retrieveChirpsByAuthorID = `-- name: RetrieveChirpsByAuthorID :many
+select id, created_at, updated_at, body, user_id from chirps where user_id = $1 order by created_at asc
+`
+
+func (q *Queries) RetrieveChirpsByAuthorID(ctx context.Context, userID uuid.UUID) ([]Chirp, error) {
+	rows, err := q.db.QueryContext(ctx, retrieveChirpsByAuthorID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Chirp
+	for rows.Next() {
+		var i Chirp
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Body,
+			&i.UserID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const saveChirp = `-- name: SaveChirp :one
 INSERT INTO chirps (id, created_at, updated_at, body, user_id)
 VALUES (

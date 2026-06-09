@@ -1,14 +1,27 @@
 package functions
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/Psyduck000054/chirpy/internal/database"
 	"github.com/google/uuid"
 )
 
 func (cfg *ApiConfig) HandlerRetrieveChirps(w http.ResponseWriter, r *http.Request) {
+	authorID := r.URL.Query().Get("author_id")
+	var userID uuid.UUID
+	var err error
+
+	if authorID != "" {
+		userID, err = uuid.Parse(authorID)
+		if err != nil {
+			RespondWithError(w, 401, "Invalid User ID")
+		}
+	} else {
+		userID = uuid.Nil
+	}
+
 	type ChirpStruct struct {
 		Id        uuid.UUID `json:"id"`
 		CreatedAt time.Time `json:"created_at"`
@@ -21,12 +34,17 @@ func (cfg *ApiConfig) HandlerRetrieveChirps(w http.ResponseWriter, r *http.Reque
 		Body []ChirpStruct `json:"body"`
 	}
 
-	chirpList, err := cfg.Queries.RetrieveAllChirps(r.Context())
+	var chirpList []database.Chirp
+	if userID == uuid.Nil {
+		chirpList, err = cfg.Queries.RetrieveAllChirps(r.Context())
+	} else {
+		chirpList, err = cfg.Queries.RetrieveChirpsByAuthorID(r.Context(), userID)
+	}
 	chirpStruct0 := ChirpStruct{}
 	output0 := Output{}
 
 	if err != nil {
-		RespondWithError(w, 400, fmt.Sprintf("something went wrong: %s\n", err))
+		RespondWithError(w, 400, "Can't retrieve the list of chirps from database")
 		return
 	}
 
